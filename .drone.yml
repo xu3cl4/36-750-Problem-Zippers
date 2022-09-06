@@ -1,0 +1,30 @@
+kind: pipeline
+name: default
+type: docker
+
+steps:
+  - name: R-tests
+    image: capnrefsmmat/statcomp:0.3
+    pull: never
+    commands:
+      - echo "Running all R tests in branch ${DRONE_SOURCE_BRANCH}."
+      - echo "Looking in directory $(.ci/get-dirname.py)"
+      - cd "$(.ci/get-dirname.py)"
+      - Rscript ../.ci/run-tests.R
+
+  # pytest exit code 5 is "no tests found"; discard that error.
+  # drone uses 'set -e' to die immediately on error; to catch the
+  # error instead, we disable the flag.
+  - name: Python-tests
+    image: capnrefsmmat/statcomp:0.3
+    pull: never
+    commands:
+      - echo "Running all Python tests in branch ${DRONE_SOURCE_BRANCH}:"
+      - echo "Looking in directory $(.ci/get-dirname.py)"
+      - flake8 "$(.ci/get-dirname.py)"
+      - cd "$(.ci/get-dirname.py)"
+      - set +e; pytest -v; ret=$?; [ $ret = 5 ] && exit 0 || exit $ret
+
+trigger:
+  event:
+    - pull_request
