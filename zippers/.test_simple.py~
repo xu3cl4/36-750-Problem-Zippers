@@ -1,0 +1,12 @@
+from ..zipper import ( zipper, vector_zipper,
+                       up, down, left, right,
+                       node, root, replace, edit,
+                       insert_left, insert_right)
+                       
+from pyrsistent  import pmap, pvector, m, v, PMap, PVector
+
+def test_basic_zipper_moves():
+    
+
+                        
+                        
